@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Ponto Eletrônico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .user-info {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #34495e;
+            color: white;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            padding: 15px 25px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li:hover, .sidebar-menu li.active {
+            background-color: #2c3e50;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .screen-title {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 18px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        
+        .time-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .time-inputs input {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-large {
+            padding: 20px 30px;
+            font-size: 24px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .employee-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            margin-bottom: 10px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        
+        .punch-history {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .history-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .history-header {
+            font-weight: bold;
+            background-color: #eee;
+            border-radius: 5px;
+        }
+        
+        .notification-options {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .notification-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .notification-option.selected {
+            border-color: #3498db;
+            background-color: #eaf2f8;
+        }
+        
+        .notification-option i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+        
+        .notification-option.selected i {
+            color: #3498db;
+        }
+        
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .admin-action {
+            padding: 20px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .admin-action:hover {
+            background-color: #e9ecef;
+        }
+        
+        .admin-action i {
+            font-size: 40px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: #2ecc71;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background-color: #e74c3c;
+        }
+        
+        .employee-list {
+            margin-top: 20px;
+        }
+        
+        .employee-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .employee-header {
+            font-weight: bold;
+            background-color: #eee;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .send-proof-btn {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .employee-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .employee-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .user-info {
+                position: relative;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-fingerprint"></i>
+                <span>Controle de Ponto Eletrônico</span>
+            </div>
+            <div class="user-info" id="user-info" style="display: none;">
+                <span>Administrador</span>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="active" onclick="showScreen('login-screen')">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </li>
+                    <li onclick="showScreen('admin-screen')" id="admin-menu" style="display: none;">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Administrador</span>
+                    </li>
+                    <li onclick="showScreen('employee-screen')">
+                        <i class="fas fa-user-clock"></i>
+                        <span>Registrar Ponto</span>
+                    </li>
+                    <li onclick="showScreen('history-screen')">
+                        <i class="fas fa-history"></i>
+                        <span>Histórico</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="main-content">
+                <!-- Tela de Login -->
+                <div id="login-screen" class="screen active">
+                    <h2 class="screen-title">Login do Sistema</h2>
+                    <div class="form-group">
+                        <label for="username">Usuário</label>
+                        <input type="text" id="username" placeholder="Digite seu usuário" value="admin">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" placeholder="Digite sua senha" value="admin">
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="login()">
+                        <i class="fas fa-sign-in-alt"></i> Entrar como Administrador
+                    </button>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <span>OU</span>
+                    </div>
+                    
+                    <button class="btn btn-success btn-large" onclick="showScreen('employee-screen')">
+                        <i class="fas fa-user-clock"></i> Acessar como Funcionário
+                    </button>
+                </div>
+                
+                <!-- Tela do Administrador -->
+                <div id="admin-screen" class="screen">
+                    <h2 class="screen-title">Painel do Administrador</h2>
+                    
+                    <h3>Cadastrar Novo Funcionário</h3>
+                    <div class="card">
+                        <div class="form-group">
+                            <label for="employee-name">Nome Completo *</label>
+                            <input type="text" id="employee-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employee-role">Função/Cargo *</label>
+                            <input type="text" id="employee-role" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employee-cpf">CPF *</label>
+                            <input type="text" id="employee-cpf" placeholder="000.000.000-00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employee-email">E-mail *</label>
+                            <input type="email" id="employee-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employee-phone">Telefone *</label>
+                            <input type="text" id="employee-phone" placeholder="(00) 00000-0000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employee-address">Endereço Completo *</label>
+                            <input type="text" id="employee-address" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Jornada de Trabalho *</label>
+                            <div class="time-inputs">
+                                <input type="time" id="work-start" value="07:00" required>
+                                <span>às</span>
+                                <input type="time" id="work-end" value="17:00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Enviar comprovante via:</label>
+                            <div class="notification-options">
+                                <div class="notification-option selected" onclick="selectNotification(this, 'whatsapp')">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <div>WhatsApp</div>
+                                </div>
+                                <div class="notification-option" onclick="selectNotification(this, 'sms')">
+                                    <i class="fas fa-sms"></i>
+                                    <div>SMS</div>
+                                </div>
+                                <div class="notification-option" onclick="selectNotification(this, 'email')">
+                                    <i class="fas fa-envelope"></i>
+                                    <div>E-mail</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-large" onclick="registerEmployee()">
+                            <i class="fas fa-save"></i> Cadastrar Funcionário
+                        </button>
+                    </div>
+                    
+                    <h3>Funcionários Cadastrados</h3>
+                    <div class="employee-list">
+                        <div class="employee-item employee-header">
+                            <div>Nome</div>
+                            <div>Função</div>
+                            <div>Código</div>
+                            <div>Ações</div>
+                        </div>
+                        <div id="employees-list">
+                            <!-- Lista de funcionários será preenchida via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tela do Funcionário -->
+                <div id="employee-screen" class="screen">
+                    <h2 class="screen-title">Registro de Ponto</h2>
+                    
+                    <div class="form-group">
+                        <label for="employee-code">Digite seu código de funcionário</label>
+                        <input type="text" id="employee-code" placeholder="Código de 6 dígitos">
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="loadEmployeeData()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                    
+                    <div id="employee-data" style="display: none;">
+                        <h3>Dados do Funcionário</h3>
+                        <div class="card">
+                            <div class="employee-info">
+                                <div class="info-item">
+                                    <div class="info-label">Nome:</div>
+                                    <div id="display-name">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Função:</div>
+                                    <div id="display-role">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">CPF:</div>
+                                    <div id="display-cpf">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Código:</div>
+                                    <div id="display-code">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Jornada:</div>
+                                    <div id="display-workhours">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Status:</div>
+                                    <div id="punch-status">Não registrado hoje</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Registrar ponto para: <span id="current-date">27/05/2024</span></label>
+                                <div id="punch-buttons">
+                                    <button class="btn btn-success btn-large" onclick="registerPunch('in')">
+                                        <i class="fas fa-sign-in-alt"></i> Registrar Entrada
+                                    </button>
+                                    <button class="btn btn-primary btn-large" onclick="registerPunch('out')" style="display: none;" id="out-btn">
+                                        <i class="fas fa-sign-out-alt"></i> Registrar Saída
+                                    </button>
+                                </div>
+                                
+                                <button class="btn btn-warning btn-large send-proof-btn" id="send-proof-btn" onclick="sendProof()">
+                                    <i class="fas fa-paper-plane"></i> Enviar Comprovante
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tela de Histórico -->
+                <div id="history-screen" class="screen">
+                    <h2 class="screen-title">Histórico de Pontos</h2>
+                    
+                    <div class="form-group">
+                        <label for="history-employee-code">Digite seu código de funcionário</label>
+                        <input type="text" id="history-employee-code" placeholder="Código de 6 dígitos">
+                    </div>
+                    <button class="btn btn-primary btn-large" onclick="loadHistory()">
+                        <i class="fas fa-search"></i> Buscar Histórico
+                    </button>
+                    
+                    <div id="punch-history-container" style="display: none;">
+                        <h3>Registros de Ponto</h3>
+                        <div class="punch-history">
+                            <div class="history-item history-header">
+                                <div>Data</div>
+                                <div>Entrada</div>
+                                <div>Saída</div>
+                                <div>Horas Trabalhadas</div>
+                            </div>
+                            <div id="history-items">
+                                <!-- Itens de histórico serão preenchidos via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Ponto registrado com sucesso!</div>
+
+    <script>
+        // Dados armazenados localmente
+        let employees = JSON.parse(localStorage.getItem('employees')) || [];
+        let punches = JSON.parse(localStorage.getItem('punches')) || [];
+        let currentEmployee = null;
+        let notificationMethod = "whatsapp";
+        let isAdminLoggedIn = false;
+        let lastPunch = null;
+        
+        // Atualizar data atual
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('pt-BR', options);
+            return now.toLocaleDateString('pt-BR');
+        }
+        
+        // Mostrar tela específica
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            
+            // Atualizar menu ativo
+            document.querySelectorAll('.sidebar-menu li').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const menuItems = document.querySelectorAll('.sidebar-menu li');
+            if (screenId === 'login-screen') menuItems[0].classList.add('active');
+            else if (screenId === 'admin-screen') menuItems[1].classList.add('active');
+            else if (screenId === 'employee-screen') {
+                menuItems[2].classList.add('active');
+                // Limpar campos ao voltar para a tela de funcionário
+                document.getElementById('employee-code').value = '';
+                document.getElementById('employee-data').style.display = 'none';
+            } else if (screenId === 'history-screen') menuItems[3].classList.add('active');
+            
+            // Se for a tela de admin, carregar a lista de funcionários
+            if (screenId === 'admin-screen') {
+                loadEmployeesList();
+            }
+        }
+        
+        // Selecionar opção de notificação
+        function selectNotification(element, type) {
+            document.querySelectorAll('.notification-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            notificationMethod = type;
+        }
+        
+        // Login do administrador
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin') {
+                isAdminLoggedIn = true;
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('admin-menu').style.display = 'block';
+                showScreen('admin-screen');
+                showToast('Login realizado com sucesso!');
+            } else {
+                showToast('Usuário ou senha incorretos!', true);
+            }
+        }
+        
+        // Logout do administrador
+        function logout() {
+            isAdminLoggedIn = false;
+            document.getElementById('user-info').style.display = 'none';
+            document.getElementById('admin-menu').style.display = 'none';
+            showScreen('login-screen');
+            showToast('Logout realizado com sucesso!');
+        }
+        
+        // Carregar dados do funcionário
+        function loadEmployeeData() {
+            const code = document.getElementById('employee-code').value;
+            if (code.length === 6) {
+                const employee = employees.find(emp => emp.id === code);
+                
+                if (employee) {
+                    currentEmployee = employee;
+                    document.getElementById('display-name').textContent = employee.name;
+                    document.getElementById('display-role').textContent = employee.role;
+                    document.getElementById('display-cpf').textContent = employee.cpf;
+                    document.getElementById('display-code').textContent = employee.id;
+                    document.getElementById('display-workhours').textContent = `${employee.workStart} às ${employee.workEnd}`;
+                    
+                    // Verificar se já registrou ponto hoje
+                    const today = new Date().toLocaleDateString('pt-BR');
+                    const todayPunch = punches.find(p => p.employeeId === employee.id && p.date === today);
+                    
+                    if (todayPunch) {
+                        if (todayPunch.out) {
+                            document.getElementById('punch-status').textContent = 'Ponto completo hoje';
+                            document.getElementById('out-btn').style.display = 'none';
+                            document.getElementById('send-proof-btn').style.display = 'block';
+                            lastPunch = todayPunch;
+                        } else {
+                            document.getElementById('punch-status').textContent = 'Entrada registrada';
+                            document.getElementById('out-btn').style.display = 'block';
+                            document.getElementById('send-proof-btn').style.display = 'none';
+                            lastPunch = todayPunch;
+                        }
+                    } else {
+                        document.getElementById('punch-status').textContent = 'Não registrado hoje';
+                        document.getElementById('out-btn').style.display = 'none';
+                        document.getElementById('send-proof-btn').style.display = 'none';
+                        lastPunch = null;
+                    }
+                    
+                    document.getElementById('employee-data').style.display = 'block';
+                } else {
+                    showToast('Funcionário não encontrado!', true);
+                }
+            } else {
+                showToast('Por favor, digite um código válido de 6 dígitos.', true);
+            }
+        }
+        
+        // Registrar ponto
+        function registerPunch(type) {
+            if (!currentEmployee) {
+                showToast('Por favor, busque um funcionário primeiro.', true);
+                return;
+            }
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR');
+            const dateString = now.toLocaleDateString('pt-BR');
+            
+            // Verificar se já existe registro para hoje
+            let todayPunch = punches.find(p => p.employeeId === currentEmployee.id && p.date === dateString);
+            
+            if (type === 'in') {
+                if (todayPunch) {
+                    showToast('Entrada já registrada hoje!', true);
+                    return;
+                }
+                
+                // Registrar entrada
+                const newPunch = {
+                    id: Date.now().toString(),
+                    employeeId: currentEmployee.id,
+                    date: dateString,
+                    in: timeString,
+                    out: null,
+                    hours: null
+                };
+                
+                punches.push(newPunch);
+                lastPunch = newPunch;
+                
+                document.getElementById('punch-status').textContent = 'Entrada registrada';
+                document.getElementById('out-btn').style.display = 'block';
+                document.getElementById('send-proof-btn').style.display = 'none';
+                showToast(`Entrada registrada às ${timeString}!`);
+                
+                // Enviar comprovante automaticamente
+                sendProofAutomatically(newPunch, 'in');
+            } else if (type === 'out') {
+                if (!todayPunch) {
+                    showToast('Registro de entrada não encontrado!', true);
+                    return;
+                }
+                
+                if (todayPunch.out) {
+                    showToast('Saída já registrada hoje!', true);
+                    return;
+                }
+                
+                // Registrar saída e calcular horas trabalhadas
+                todayPunch.out = timeString;
+                
+                // Calcular horas trabalhadas
+                const inTime = todayPunch.in;
+                const outTime = timeString;
+                
+                // Converter para minutos
+                const inMinutes = convertTimeToMinutes(inTime);
+                const outMinutes = convertTimeToMinutes(outTime);
+                
+                // Calcular diferença
+                let diffMinutes = outMinutes - inMinutes;
+                if (diffMinutes < 0) diffMinutes += 24 * 60; // Caso passe da meia-noite
+                
+                // Converter para formato HH:MM
+                const hours = Math.floor(diffMinutes / 60);
+                const minutes = diffMinutes % 60;
+                todayPunch.hours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                document.getElementById('punch-status').textContent = 'Ponto completo hoje';
+                document.getElementById('out-btn').style.display = 'none';
+                document.getElementById('send-proof-btn').style.display = 'block';
+                lastPunch = todayPunch;
+                
+                showToast(`Saída registrada às ${timeString}! Horas trabalhadas: ${todayPunch.hours}`);
+                
+                // Enviar comprovante automaticamente
+                sendProofAutomatically(todayPunch, 'out');
+            }
+            
+            // Salvar no localStorage
+            localStorage.setItem('punches', JSON.stringify(punches));
+        }
+        
+        // Converter tempo para minutos
+        function convertTimeToMinutes(timeStr) {
+            const [time, modifier] = timeStr.split(' ');
+            let [hours, minutes, seconds] = time.split(':');
+            
+            hours = parseInt(hours);
+            minutes = parseInt(minutes || 0);
+            
+            if (modifier === 'PM' && hours < 12) hours += 12;
+            if (modifier === 'AM' && hours === 12) hours = 0;
+            
+            return hours * 60 + minutes;
+        }
+        
+        // Carregar histórico
+        function loadHistory() {
+            const code = document.getElementById('history-employee-code').value;
+            if (code.length === 6) {
+                const employee = employees.find(emp => emp.id === code);
+                
+                if (employee) {
+                    const employeePunches = punches.filter(p => p.employeeId === code);
+                    
+                    if (employeePunches.length > 0) {
+                        let historyHTML = '';
+                        
+                        employeePunches.sort((a, b) => {
+                            // Ordenar por data (mais recente primeiro)
+                            const [dayA, monthA, yearA] = a.date.split('/');
+                            const [dayB, monthB, yearB] = b.date.split('/');
+                            const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+                            const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+                            return dateB - dateA;
+                        });
+                        
+                        employeePunches.forEach(punch => {
+                            historyHTML += `
+                                <div class="history-item">
+                                    <div>${punch.date}</div>
+                                    <div>${punch.in || '-'}</div>
+                                    <div>${punch.out || '-'}</div>
+                                    <div>${punch.hours || '-'}</div>
+                                </div>
+                            `;
+                        });
+                        
+                        document.getElementById('history-items').innerHTML = historyHTML;
+                        document.getElementById('punch-history-container').style.display = 'block';
+                    } else {
+                        showToast('Nenhum registro de ponto encontrado para este funcionário.', true);
+                    }
+                } else {
+                    showToast('Funcionário não encontrado!', true);
+                }
+            } else {
+                showToast('Por favor, digite um código válido de 6 dígitos.', true);
+            }
+        }
+        
+        // Registrar funcionário
+        function registerEmployee() {
+            // Obter dados do formulário
+            const name = document.getElementById('employee-name').value;
+            const role = document.getElementById('employee-role').value;
+            const cpf = document.getElementById('employee-cpf').value;
+            const email = document.getElementById('employee-email').value;
+            const phone = document.getElementById('employee-phone').value;
+            const address = document.getElementById('employee-address').value;
+            const workStart = document.getElementById('work-start').value;
+            const workEnd = document.getElementById('work-end').value;
+            
+            // Validação básica
+            if (!name || !role || !cpf || !email || !phone || !address) {
+                showToast('Por favor, preencha todos os campos obrigatórios.', true);
+                return;
+            }
+            
+            // Gerar código de 6 dígitos
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // Criar novo funcionário
+            const newEmployee = {
+                id: code,
+                name,
+                role,
+                cpf,
+                email,
+                phone,
+                address,
+                workStart,
+                workEnd,
+                notification: notificationMethod
+            };
+            
+            // Adicionar à lista
+            employees.push(newEmployee);
+            
+            // Salvar no localStorage
+            localStorage.setItem('employees', JSON.stringify(employees));
+            
+            // Mostrar mensagem de sucesso
+            showToast(`Funcionário ${name} cadastrado com sucesso! Código: ${code}`);
+            
+            // Limpar formulário
+            document.getElementById('employee-name').value = '';
+            document.getElementById('employee-role').value = '';
+            document.getElementById('employee-cpf').value = '';
+            document.getElementById('employee-email').value = '';
+            document.getElementById('employee-phone').value = '';
+            document.getElementById('employee-address').value = '';
+            
+            // Atualizar lista de funcionários
+            loadEmployeesList();
+        }
+        
+        // Carregar lista de funcionários
+        function loadEmployeesList() {
+            const employeesList = document.getElementById('employees-list');
+            employeesList.innerHTML = '';
+            
+            if (employees.length === 0) {
+                employeesList.innerHTML = '<div class="employee-item">Nenhum funcionário cadastrado</div>';
+                return;
+            }
+            
+            employees.forEach(employee => {
+                const employeeItem = document.createElement('div');
+                employeeItem.className = 'employee-item';
+                employeeItem.innerHTML = `
+                    <div>${employee.name}</div>
+                    <div>${employee.role}</div>
+                    <div>${employee.id}</div>
+                    <div>
+                        <button class="action-btn" onclick="deleteEmployee('${employee.id}')">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                `;
+                employeesList.appendChild(employeeItem);
+            });
+        }
+        
+        // Excluir funcionário
+        function deleteEmployee(employeeId) {
+            if (confirm('Tem certeza que deseja excluir este funcionário?')) {
+                employees = employees.filter(emp => emp.id !== employeeId);
+                punches = punches.filter(p => p.employeeId !== employeeId);
+                
+                localStorage.setItem('employees', JSON.stringify(employees));
+                localStorage.setItem('punches', JSON.stringify(punches));
+                
+                showToast('Funcionário excluído com sucesso!');
+                loadEmployeesList();
+            }
+        }
+        
+        // Enviar comprovante automaticamente
+        function sendProofAutomatically(punch, type) {
+            const employee = employees.find(emp => emp.id === punch.employeeId);
+            if (!employee) return;
+            
+            const message = type === 'in' 
+                ? `Entrada registrada em ${punch.date} às ${punch.in}`
+                : `Saída registrada em ${punch.date} às ${punch.out}. Horas trabalhadas: ${punch.hours}`;
+            
+            // Simular envio de comprovante
+            setTimeout(() => {
+                showToast(`Comprovante enviado por ${employee.notification === 'whatsapp' ? 'WhatsApp' : employee.notification === 'sms' ? 'SMS' : 'E-mail'}!`);
+            }, 1000);
+        }
+        
+        // Enviar comprovante manualmente
+        function sendProof() {
+            if (!lastPunch) {
+                showToast('Nenhum registro de ponto encontrado para enviar comprovante.', true);
+                return;
+            }
+            
+            const employee = employees.find(emp => emp.id === lastPunch.employeeId);
+            if (!employee) return;
+            
+            const message = lastPunch.out 
+                ? `Comprovante de ponto: Entrada ${lastPunch.in}, Saída ${lastPunch.out} em ${lastPunch.date}. Horas trabalhadas: ${lastPunch.hours}`
+                : `Comprovante de ponto: Entrada registrada em ${lastPunch.date} às ${lastPunch.in}`;
+            
+            // Simular envio de comprovante
+            showToast(`Comprovante enviado por ${employee.notification === 'whatsapp' ? 'WhatsApp' : employee.notification === 'sms' ? 'SMS' : 'E-mail'}!`);
+        }
+        
+        // Mostrar toast de notificação
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = isError ? 'toast error' : 'toast';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Inicialização
+        updateCurrentDate();
+        
+        // Adicionar funcionário de exemplo se não existir
+        if (employees.length === 0) {
+            employees.push({
+                id: "123456",
+                name: "Carlos Silva",
+                role: "Analista de TI",
+                cpf: "123.456.789-00",
+                email: "carlos@empresa.com",
+                phone: "(11) 99999-9999",
+                address: "Rua das Flores, 123, São Paulo - SP",
+                workStart: "07:00",
+                workEnd: "17:00",
+                notification: "whatsapp"
+            });
+            localStorage.setItem('employees', JSON.stringify(employees));
+        }
+    </script>
+</body>
+</html>
